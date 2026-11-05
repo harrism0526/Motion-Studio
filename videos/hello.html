@@ -1,0 +1,61 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../brand.css">
+<script src="../lib/motion.js"></script>
+<style>
+  #stage { width: 1920px; height: 1080px; display: grid; place-items: center; }
+  .blob { position: absolute; border-radius: 50%; }
+  #b1 { width: 900px; height: 900px; background: var(--soft); }
+  #b2 { width: 220px; height: 220px; background: var(--accent); }
+  #title { font-family: var(--font-display); font-weight: 700; font-size: 132px;
+           letter-spacing: -0.03em; white-space: nowrap; position: relative; }
+  #title span { display: inline-block; }
+  #title .hi { color: var(--primary); }
+  #bar { position: absolute; height: 10px; border-radius: 5px; background: var(--primary);
+         left: 50%; top: 640px; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div class="blob" id="b1"></div>
+  <div class="blob" id="b2"></div>
+  <div id="title"></div>
+  <div id="bar"></div>
+</div>
+<script>
+  window.DURATION = 3;
+  window.SIZE = [1920, 1080];
+
+  const words = ["Hello", "from", "my", "studio"];
+  const title = document.getElementById("title");
+  title.innerHTML = words.map((w, i) => `<span class="${i === 3 ? "hi" : ""}">${w}</span>`)
+                         .join('<span>&nbsp;</span>');
+  const spans = [...title.querySelectorAll("span")].filter(s => s.textContent.trim());
+  const b1 = document.getElementById("b1"), b2 = document.getElementById("b2"), bar = document.getElementById("bar");
+  const { tween, ease } = M;
+
+  window.render = function (t) {
+    // Background blob grows in, then breathes gently
+    const s = tween(t, 0, 0.8, 0.2, 1, ease.out) + 0.02 * Math.sin(t * 2.5);
+    b1.style.transform = `scale(${s})`;
+    // Accent dot orbits the centre
+    const a = t * 1.4 - 0.6;
+    b2.style.transform = `translate(${Math.cos(a) * 520}px, ${Math.sin(a) * 300}px)
+                          scale(${tween(t, 0.2, 0.9, 0, 1, ease.back)})`;
+    // Words rise in one after another
+    spans.forEach((el, i) => {
+      const st = 0.35 + i * 0.18;
+      el.style.opacity = tween(t, st, st + 0.4, 0, 1);
+      el.style.transform = `translateY(${tween(t, st, st + 0.5, 60, 0, ease.back)}px)`;
+    });
+    // Underline draws across, then everything fades out at the end
+    const w = tween(t, 1.2, 1.9, 0, 640, ease.inOut);
+    bar.style.width = w + "px";
+    bar.style.marginLeft = -w / 2 + "px";
+    document.getElementById("stage").style.opacity = tween(t, 2.6, 3, 1, 0, ease.in);
+  };
+</script>
+</body>
+</html>
