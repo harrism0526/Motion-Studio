@@ -5,55 +5,52 @@
 <link rel="stylesheet" href="../brand.css">
 <script src="../lib/motion.js"></script>
 <style>
-  #stage { width: 1920px; height: 1080px; display: grid; place-items: center; }
-  .blob { position: absolute; border-radius: 50%; }
-  #b1 { width: 900px; height: 900px; background: var(--soft); }
-  #b2 { width: 220px; height: 220px; background: var(--accent); }
-  #title { font-family: var(--font-display); font-weight: 700; font-size: 132px;
-           letter-spacing: -0.03em; white-space: nowrap; position: relative; }
-  #title span { display: inline-block; }
+  /* TikTok vertical. Content sits in the safe zone (see brand.css). */
+  #stage { width: 1080px; height: 1920px; }
+  #safe  { position: absolute; top: var(--safe-top); bottom: var(--safe-bottom);
+           left: var(--safe-left); right: var(--safe-right);
+           display: flex; flex-direction: column; justify-content: center; align-items: center; }
+  .blob { position: absolute; border-radius: 50%; left: 50%; top: 50%; }
+  #b1 { width: 820px; height: 820px; margin: -410px 0 0 -410px; background: var(--soft); }
+  #b2 { width: 150px; height: 150px; margin: -75px 0 0 -75px; background: var(--accent); }
+  #title { font-family: var(--font-display); font-weight: 800; font-size: 150px; line-height: 1.02;
+           letter-spacing: -0.035em; text-align: center; position: relative; }
+  #title span { display: block; }
   #title .hi { color: var(--primary); }
-  #bar { position: absolute; height: 10px; border-radius: 5px; background: var(--primary);
-         left: 50%; top: 640px; }
+  #bar { height: 12px; border-radius: 6px; background: var(--primary); margin-top: 48px; position: relative; }
 </style>
 </head>
 <body>
 <div id="stage">
-  <div class="blob" id="b1"></div>
-  <div class="blob" id="b2"></div>
-  <div id="title"></div>
-  <div id="bar"></div>
+  <div id="safe">
+    <div class="blob" id="b1"></div>
+    <div class="blob" id="b2"></div>
+    <div id="title"><span>Hello</span><span>from my</span><span class="hi">studio</span></div>
+    <div id="bar"></div>
+  </div>
 </div>
 <script>
   window.DURATION = 3;
-  window.SIZE = [1920, 1080];
+  window.SIZE = [1080, 1920];
 
-  const words = ["Hello", "from", "my", "studio"];
-  const title = document.getElementById("title");
-  title.innerHTML = words.map((w, i) => `<span class="${i === 3 ? "hi" : ""}">${w}</span>`)
-                         .join('<span>&nbsp;</span>');
-  const spans = [...title.querySelectorAll("span")].filter(s => s.textContent.trim());
+  const lines = [...document.querySelectorAll("#title span")];
   const b1 = document.getElementById("b1"), b2 = document.getElementById("b2"), bar = document.getElementById("bar");
   const { tween, ease } = M;
 
   window.render = function (t) {
-    // Background blob grows in, then breathes gently
-    const s = tween(t, 0, 0.8, 0.2, 1, ease.out) + 0.02 * Math.sin(t * 2.5);
-    b1.style.transform = `scale(${s})`;
-    // Accent dot orbits the centre
+    // Background circle grows in, then breathes gently
+    b1.style.transform = `scale(${tween(t, 0, 0.8, 0.2, 1, ease.out) + 0.02 * Math.sin(t * 2.5)})`;
+    // Accent dot orbits the circle's edge
     const a = t * 1.4 - 0.6;
-    b2.style.transform = `translate(${Math.cos(a) * 520}px, ${Math.sin(a) * 300}px)
+    b2.style.transform = `translate(${Math.cos(a) * 400}px, ${Math.sin(a) * 400}px)
                           scale(${tween(t, 0.2, 0.9, 0, 1, ease.back)})`;
-    // Words rise in one after another
-    spans.forEach((el, i) => {
-      const st = 0.35 + i * 0.18;
-      el.style.opacity = tween(t, st, st + 0.4, 0, 1);
-      el.style.transform = `translateY(${tween(t, st, st + 0.5, 60, 0, ease.back)}px)`;
+    // Lines rise in one after another (fast hook for the scroll)
+    lines.forEach((el, i) => {
+      const st = 0.25 + i * 0.2;
+      el.style.opacity = tween(t, st, st + 0.35, 0, 1);
+      el.style.transform = `translateY(${tween(t, st, st + 0.5, 80, 0, ease.back)}px)`;
     });
-    // Underline draws across, then everything fades out at the end
-    const w = tween(t, 1.2, 1.9, 0, 640, ease.inOut);
-    bar.style.width = w + "px";
-    bar.style.marginLeft = -w / 2 + "px";
+    bar.style.width = tween(t, 1.1, 1.8, 0, 420, ease.inOut) + "px";
     document.getElementById("stage").style.opacity = tween(t, 2.6, 3, 1, 0, ease.in);
   };
 </script>

@@ -3,6 +3,7 @@
 //
 //   node render.mjs videos/hello.html            -> out/hello.mp4
 //   node render.mjs hello --stills 3             -> out/hello-still-1.png … -3.png
+//   node render.mjs hello --stills 3 --guides    -> stills with TikTok UI zones shaded red
 //   node render.mjs hello --fps 60               -> override frame rate (default 30)
 //
 // A video is an HTML file that sets window.DURATION (seconds), window.SIZE ([w, h])
@@ -37,11 +38,13 @@ const opt = (name, fallback) => {
   if (!Number.isFinite(v) || v <= 0) { console.error(`--${name} needs a positive number`); process.exit(1); }
   return v;
 };
+const flag = name => { const i = args.indexOf(`--${name}`); if (i !== -1) args.splice(i, 1); return i !== -1; };
+const guides = flag("guides");
 const stills = opt("stills", 0);
 const fps = opt("fps", 30);
 let input = args[0];
 if (!input) {
-  console.error("Usage: node render.mjs <video.html | name> [--stills N] [--fps N]");
+  console.error("Usage: node render.mjs <video.html | name> [--stills N] [--guides] [--fps N]");
   process.exit(1);
 }
 // Accept "hello", "hello.html" or a full path
@@ -86,10 +89,20 @@ const lastT = (totalFrames - 1) / fps;
 // ── Stills mode ─────────────────────────────────────────────────────────
 if (stills) {
   const { writeFileSync } = await import("node:fs");
+  if (guides) await page.evaluate(() => {
+    // Shade the areas TikTok covers with its UI (sizes come from brand.css)
+    const css = getComputedStyle(document.documentElement);
+    const v = k => css.getPropertyValue(k).trim() || "0px";
+    const g = document.createElement("div");
+    g.style.cssText = `position:fixed;inset:0;pointer-events:none;z-index:99999;
+      border:solid rgba(255,0,60,.28);border-width:${v("--safe-top")} ${v("--safe-right")} ${v("--safe-bottom")} ${v("--safe-left")};
+      outline:3px dashed rgba(255,0,60,.8);outline-offset:-3px`;
+    document.body.appendChild(g);
+  });
   for (let i = 0; i < stills; i++) {
     // Evenly spaced through the video, snapped to real frame times
     const t = Math.round(((i + 0.5) / stills) * lastT * fps) / fps;
-    const file = path.join(outDir, `${name}-still-${i + 1}.png`);
+    const file = path.join(outDir, `${name}-still-${i + 1}${guides ? "-guides" : ""}.png`);
     writeFileSync(file, await frameAt(t));
     console.log(`  still ${i + 1}/${stills}  t=${t.toFixed(2)}s  → ${path.relative(ROOT, file)}`);
   }

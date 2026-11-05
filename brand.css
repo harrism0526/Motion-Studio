@@ -17,6 +17,15 @@
   --font-mono:    "JetBrains Mono", ui-monospace, monospace;
 }
 
+/* TikTok 1080×1920 safe zone: keep text inside these margins so the
+   caption, username and like/share buttons don't cover it. */
+:root {
+  --safe-top:    160px;
+  --safe-bottom: 420px;
+  --safe-left:   60px;
+  --safe-right:  150px;
+}
+
 /* Base stage: every video renders into a fixed-size frame */
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html, body {
