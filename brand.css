@@ -1,19 +1,31 @@
-/* ───────────────────────────────────────────────
-   Brand tokens: swap these for your real colours & fonts.
-   Every video links this file, so one change restyles everything.
-   ─────────────────────────────────────────────── */
+/* Brand tokens for Lighter Living · Michelle Daniel Harris
+   Every video links this file, so one change restyles everything. */
 :root {
-  /* Colours: Lighter Living (apricot · beige · navy) */
-  --bg:        #F4EADF;   /* beige canvas                     */
-  --ink:       #1B2A4A;   /* navy, all text                   */
-  --muted:     #5B6B85;   /* soft navy for secondary text     */
-  --primary:   #1B2A4A;   /* navy, the hero colour            */
-  --accent:    #F2A36B;   /* apricot: shapes, lines, pops     */
-  --soft:      #EAD9C6;   /* deeper beige for big background shapes */
+  /* Lighter Living Starter Guide palette (exact hex from the guide) */
+  --teal:       #0B7F7A;
+  --teal-dark:  #075D59;
+  --teal-pale:  #DFF3F0;
+  --coral:      #EF7F69;
+  --coral-dark: #CE6553;
+  --cream:      #FBF6ED;
+  --green:      #173F3B;   /* headlines */
+  --ink-raw:    #17322F;   /* body text */
+  --muted-raw:  #58706C;
+  --line:       #D9E5E1;
 
-  /* Fonts */
-  --font-display: "Inter Display", "Inter", system-ui, sans-serif;
-  --font-body:    "Inter", system-ui, sans-serif;
+  /* Roles: videos use these, so the palette can change without touching videos */
+  --bg:      var(--cream);
+  --ink:     var(--ink-raw);
+  --heading: var(--green);
+  --muted:   var(--muted-raw);
+  --primary: var(--teal);       /* highlighted words, like the guide's <em> */
+  --accent:  var(--coral);      /* lines, dots, call-to-action buttons */
+  --soft:    var(--teal-pale);  /* big background shapes */
+
+  /* Fonts: Georgia headlines + Inter body, as in the guide.
+     Bitstream Charter stands in where Georgia isn't installed (Linux cloud renders). */
+  --font-display: Georgia, "Bitstream Charter", Charter, "Times New Roman", serif;
+  --font-body:    "Inter", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
   --font-mono:    "JetBrains Mono", ui-monospace, monospace;
 }
 
